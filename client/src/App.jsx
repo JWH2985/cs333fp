@@ -1,26 +1,19 @@
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, useNavigate, useLocation } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import Landing from './pages/Landing';
 import Gallery from './pages/Gallery';
 
-function App() {
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
+function AppContent({ user, setUser, loading }) {
+  const navigate = useNavigate();
+  const location = useLocation();
 
+  // Clean up malformed URLs
   useEffect(() => {
-    // Check if user is authenticated
-    fetch('/auth/current-user', {
-      credentials: 'include'
-    })
-      .then(res => res.json())
-      .then(data => {
-        if (data.user) {
-          setUser(data.user);
-        }
-      })
-      .catch(err => console.error('Auth check failed:', err))
-      .finally(() => setLoading(false));
-  }, []);
+    if (location.pathname.includes('!')) {
+      const cleanPath = location.pathname.replace(/!/g, '');
+      navigate(cleanPath, { replace: true });
+    }
+  }, [location.pathname, navigate]);
 
   if (loading) {
     return (
@@ -31,17 +24,43 @@ function App() {
   }
 
   return (
-    <Router>
-      <Routes>
-        <Route 
-          path="/" 
-          element={user ? <Navigate to="/gallery" /> : <Landing />} 
-        />
-        <Route 
-          path="/gallery" 
-          element={user ? <Gallery user={user} setUser={setUser} /> : <Navigate to="/" />} 
-        />
-      </Routes>
+    <Routes>
+      <Route 
+        path="/" 
+        element={user ? <Navigate to="/gallery" replace /> : <Landing />} 
+      />
+      <Route 
+        path="/gallery" 
+        element={user ? <Gallery user={user} setUser={setUser} /> : <Navigate to="/" replace />} 
+      />
+    </Routes>
+  );
+}
+
+function App() {
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetch('/auth/current-user', {
+      credentials: 'include'
+    })
+      .then(res => {
+        if (res.ok) return res.json();
+        throw new Error('Not authenticated');
+      })
+      .then(data => {
+        if (data.user) {
+          setUser(data.user);
+        }
+      })
+      .catch(err => console.error('Auth check failed:', err))
+      .finally(() => setLoading(false));
+  }, []);
+
+  return (
+    <Router basename="/FinalProject">
+      <AppContent user={user} setUser={setUser} loading={loading} />
     </Router>
   );
 }
