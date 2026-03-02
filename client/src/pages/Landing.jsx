@@ -34,6 +34,29 @@ function Landing() {
 
           {/* Sign In Button */}
           <div className="space-y-4">
+             <button
+                onClick={() => window.location.href = '/FinalProject/login'}
+                className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-3 px-6 rounded-lg transition-colors"
+              >
+                Sign In with Email
+              </button>
+
+              <button
+                onClick={() => window.location.href = '/FinalProject/register'}
+                className="w-full bg-gray-600 hover:bg-gray-700 text-white font-medium py-3 px-6 rounded-lg transition-colors"
+              >
+                Create Account
+              </button>
+
+              {/* Divider */}
+              <div className="relative my-6">
+                <div className="absolute inset-0 flex items-center">
+                  <div className="w-full border-t border-gray-300"></div>
+                </div>
+                <div className="relative flex justify-center text-sm">
+                  <span className="px-2 bg-white text-gray-500">Or</span>
+                </div>
+              </div>
             <button
               onClick={handleGoogleLogin}
               className="w-full flex items-center justify-center gap-3 bg-white border-2 border-gray-300 rounded-lg px-6 py-3 text-gray-700 font-medium hover:bg-gray-50 hover:border-gray-400 transition-colors duration-200 shadow-sm"

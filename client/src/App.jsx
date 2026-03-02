@@ -2,6 +2,8 @@ import { BrowserRouter as Router, Routes, Route, Navigate, useNavigate, useLocat
 import { useState, useEffect } from 'react';
 import Landing from './pages/Landing';
 import Gallery from './pages/Gallery';
+import Login from './pages/Login';
+import Register from './pages/Register';
 
 function AppContent({ user, setUser, loading }) {
   const navigate = useNavigate();
@@ -30,9 +32,18 @@ function AppContent({ user, setUser, loading }) {
         element={user ? <Navigate to="/gallery" replace /> : <Landing />} 
       />
       <Route 
+        path="/login" 
+        element={<Login />} 
+      />
+      <Route 
+        path="/register" 
+        element={<Register />} 
+      />
+      <Route 
         path="/gallery" 
         element={user ? <Gallery user={user} setUser={setUser} /> : <Navigate to="/" replace />} 
       />
+
     </Routes>
   );
 }

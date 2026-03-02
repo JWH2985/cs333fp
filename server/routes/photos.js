@@ -92,62 +92,62 @@ router.get('/seed', isAuthenticated, async (req, res) => {
     }
   const samplePhotos = [
   {
-    title: 'Photo 1',
+    title: 'The Crimson Gaze of the Infinite',
     description: 'From my photography collection',
     imageUrl: '/images/cs333fp (1).jpg'
   },
   {
-    title: 'Photo 2',
+    title: 'Lunar Optimization: 50% Loading',
     description: 'From my photography collection',
     imageUrl: '/images/cs333fp (2).jpg'
   },
   {
-    title: 'Photo 3',
+    title: 'The Sky is Lava',
     description: 'From my photography collection',
     imageUrl: '/images/cs333fp (3).jpg'
   },
   {
-    title: 'Photo 4',
+    title: 'Suburban Solitude',
     description: 'From my photography collection',
     imageUrl: '/images/cs333fp (4).jpg'
   },
   {
-    title: 'Photo 5',
+    title: 'Moonlight Through the Brush',
     description: 'From my photography collection',
     imageUrl: '/images/cs333fp (5).jpg'
   },
   {
-    title: 'Photo 6',
+    title: 'The Council of Boulders Discusses the Horizon',
     description: 'From my photography collection',
     imageUrl: '/images/cs333fp (6).jpg'
   },
   {
-    title: 'Photo 7',
+    title: 'The Universe’s Low-Light Mode',
     description: 'From my photography collection',
     imageUrl: '/images/cs333fp (7).jpg'
   },
   {
-    title: 'Photo 8',
+    title: 'Cloudy with a Chance of Melodrama',
     description: 'From my photography collection',
     imageUrl: '/images/cs333fp (8).JPG'
   },
   {
-    title: 'Photo 9',
+    title: 'The Forest’s Final Warning',
     description: 'From my photography collection',
     imageUrl: '/images/cs333fp (9).jpg'
   },
   {
-    title: 'Photo 10',
+    title: 'Sun Sandwich on Toasted Rye Clouds',
     description: 'From my photography collection',
     imageUrl: '/images/cs333fp (10).jpg'
   },
   {
-    title: 'Photo 11',
+    title: 'The Sanguine Spires of Silent Judgment',
     description: 'From my photography collection',
     imageUrl: '/images/cs333fp (11).jpg'
   },
   {
-    title: 'Photo 12',
+    title: 'Legacy Hardware: The Barn Edition',
     description: 'From my photography collection',
     imageUrl: '/images/cs333fp (12).jpg'  
   }

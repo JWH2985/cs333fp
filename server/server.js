@@ -5,8 +5,12 @@ const session = require('express-session');
 const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const cors = require('cors');
+const localAuthRoutes = require('./routes/localAuth');
+
+const User = require('./models/User');
 
 const app = express();
+app.set('trust proxy', 1);
 const PORT = process.env.PORT || 5000;
 
 // Middleware
@@ -31,56 +35,46 @@ app.use(session({
 // Initialize Passport
 app.use(passport.initialize());
 app.use(passport.session());
-
-// MongoDB User Schema
-const userSchema = new mongoose.Schema({
-  googleId: { type: String, required: true, unique: true },
-  email: { type: String, required: true },
-  name: { type: String, required: true },
-  picture: String,
-  createdAt: { type: Date, default: Date.now },
-  lastLogin: { type: Date, default: Date.now }
-});
-
-const User = mongoose.model('User', userSchema);
+app.use('/auth', localAuthRoutes);
 
 // Import Photo routes
 const photoRoutes = require('./routes/photos');
 
-// Passport Google OAuth Strategy
 passport.use(new GoogleStrategy({
-    clientID: process.env.GOOGLE_CLIENT_ID,
-    clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-    callbackURL: '/auth/google/callback'
-  },
+  clientID: process.env.GOOGLE_CLIENT_ID,
+  clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+  callbackURL: '/auth/google/callback'
+},
   async (accessToken, refreshToken, profile, done) => {
     try {
-      // Find or create user
       let user = await User.findOne({ googleId: profile.id });
-      
-      if (!user) {
-        // Create new user
-        user = await User.create({
-          googleId: profile.id,
-          email: profile.emails[0].value,
-          name: profile.displayName,
-          picture: profile.photos[0]?.value
-        });
-        console.log('New user created:', user.email);
-      } else {
+
+      if (user) {
         // Update last login
         user.lastLogin = new Date();
+        if (!user.authMethod) {
+          user.authMethod = 'google';
+        }
         await user.save();
-        console.log('Existing user logged in:', user.email);
+        return done(null, user);
       }
-      
-      return done(null, user);
+
+      // Create new user
+      user = new User({
+        googleId: profile.id,
+        email: profile.emails[0].value,
+        name: profile.displayName,
+        picture: profile.photos[0]?.value,
+        authMethod: 'google' 
+      });
+
+      await user.save();
+      done(null, user);
     } catch (error) {
-      return done(error, null);
+      done(error, null);
     }
   }
 ));
-
 // Serialize user for session
 passport.serializeUser((user, done) => {
   done(null, user.id);
@@ -137,7 +131,7 @@ app.get('/api/users', async (req, res) => {
   if (!req.isAuthenticated()) {
     return res.status(401).json({ error: 'Not authenticated' });
   }
-  
+
   try {
     const users = await User.find().sort({ createdAt: -1 });
     res.json({ users });
@@ -166,3 +160,14 @@ mongoose.connect(process.env.MONGODB_URI)
     console.error('MongoDB connection error:', error);
     process.exit(1);
   });
+
+// TEMPORARY - Clear all photos
+app.get('/dev/clear-photos', async (req, res) => {
+  try {
+    const Photo = require('./models/Photo');
+    const result = await Photo.deleteMany({});
+    res.json({ message: `Deleted ${result.deletedCount} photos` });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
