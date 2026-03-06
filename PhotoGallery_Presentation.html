@@ -1,0 +1,960 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PhotoGallery Lite - Project Presentation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+            overflow: hidden;
+        }
+
+        .slide-container {
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            transition: transform 0.5s cubic-bezier(0.4, 0.0, 0.2, 1);
+        }
+
+        .slide {
+            min-width: 100vw;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 60px;
+            background: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Split screen layout for code slides */
+        .slide.split-screen {
+            flex-direction: row;
+            justify-content: space-between;
+            align-items: stretch;
+            padding: 0;
+        }
+
+        .split-left {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 60px;
+            background: white;
+        }
+
+        .split-right {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 40px;
+            background: #2d2d2d;
+        }
+
+        .slide h1 {
+            font-size: 3.5em;
+            margin-bottom: 20px;
+            color: #667eea;
+            text-align: center;
+        }
+
+        .slide h2 {
+            font-size: 2.5em;
+            margin-bottom: 30px;
+            color: #764ba2;
+            text-align: center;
+        }
+
+        .slide h3 {
+            font-size: 1.8em;
+            margin: 20px 0;
+            color: #667eea;
+        }
+
+        .split-left h2 {
+            text-align: left;
+            font-size: 2.2em;
+            margin-bottom: 25px;
+        }
+
+        .split-left h3 {
+            font-size: 1.5em;
+            margin: 15px 0 10px 0;
+        }
+
+        .split-left p {
+            font-size: 1.1em;
+        }
+
+        .slide p, .slide li {
+            font-size: 1.3em;
+            line-height: 1.6;
+            margin: 10px 0;
+            max-width: 900px;
+        }
+
+        .slide ul {
+            list-style: none;
+            max-width: 900px;
+        }
+
+        .slide li:before {
+            content: "✓ ";
+            color: #667eea;
+            font-weight: bold;
+            font-size: 1.2em;
+            margin-right: 10px;
+        }
+
+        .split-left ul {
+            max-width: 100%;
+        }
+
+        .split-left li {
+            font-size: 1.1em;
+            margin: 8px 0;
+        }
+
+        .code-block {
+            background: #2d2d2d;
+            color: #f8f8f2;
+            padding: 30px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 1.1em;
+            margin: 20px 0;
+            max-width: 900px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+        }
+
+        /* Code block for split screen - no background, already on dark side */
+        .split-right .code-block {
+            background: transparent;
+            box-shadow: none;
+            padding: 0;
+            margin: 0;
+            max-width: 100%;
+            font-size: 1em;
+            line-height: 1.5;
+        }
+
+        .code-block .comment {
+            color: #75715e;
+        }
+
+        .code-block .keyword {
+            color: #66d9ef;
+        }
+
+        .code-block .string {
+            color: #e6db74;
+        }
+
+        .code-block .function {
+            color: #a6e22e;
+        }
+
+        .highlight {
+            background: #ffd700;
+            padding: 2px 8px;
+            border-radius: 3px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .split-right .highlight {
+            background: #ffd700;
+            color: #2d2d2d;
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 30px;
+            margin: 30px 0;
+            max-width: 1000px;
+        }
+
+        .feature-card {
+            background: linear-gradient(135deg, #667eea22 0%, #764ba222 100%);
+            padding: 30px;
+            border-radius: 12px;
+            border: 2px solid #667eea;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .feature-card h4 {
+            color: #667eea;
+            font-size: 1.5em;
+            margin-bottom: 15px;
+        }
+
+        .feature-card p {
+            font-size: 1.1em;
+            margin: 0;
+        }
+
+        .navigation {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            display: flex;
+            gap: 15px;
+            z-index: 1000;
+        }
+
+        .nav-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 1.2em;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+        }
+
+        .nav-btn:hover {
+            background: #764ba2;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 8px rgba(0,0,0,0.3);
+        }
+
+        .nav-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        .slide-number {
+            position: fixed;
+            bottom: 30px;
+            left: 30px;
+            background: rgba(0,0,0,0.7);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-size: 1.1em;
+            z-index: 1000;
+        }
+
+        .subtitle {
+            font-size: 1.5em;
+            color: #666;
+            text-align: center;
+            margin-top: 10px;
+        }
+
+        .author {
+            font-size: 1.3em;
+            color: #764ba2;
+            margin-top: 30px;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            max-width: 1000px;
+            margin: 30px 0;
+            gap: 40px;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 3em;
+            font-weight: bold;
+            color: #667eea;
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        .stat-label {
+            font-size: 1.2em;
+            color: #666;
+            display: block;
+            white-space: nowrap;
+        }
+
+        .security-badge {
+            background: #e74c3c;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 20px;
+            display: inline-block;
+            margin: 10px;
+            font-weight: bold;
+        }
+
+        .tech-stack {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            justify-content: center;
+            margin: 30px 0;
+        }
+
+        .tech-badge {
+            background: #667eea;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 25px;
+            font-size: 1.1em;
+            font-weight: bold;
+        }
+
+        .comparison-table {
+            width: 100%;
+            max-width: 900px;
+            margin: 20px 0;
+            border-collapse: collapse;
+        }
+
+        .comparison-table th,
+        .comparison-table td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 2px solid #ddd;
+        }
+
+        .comparison-table th {
+            background: #667eea;
+            color: white;
+            font-size: 1.2em;
+        }
+
+        .comparison-table tr:hover {
+            background: #f5f5f5;
+        }
+
+        .good {
+            color: #27ae60;
+            font-weight: bold;
+        }
+
+        .bad {
+            color: #e74c3c;
+            font-weight: bold;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .slide > * {
+            animation: fadeIn 0.5s ease-out;
+        }
+    </style>
+</head>
+<body>
+    <div class="slide-number" id="slideNumber">1 / 14</div>
+    
+    <div class="navigation">
+        <button class="nav-btn" id="prevBtn" onclick="prevSlide()">← Previous</button>
+        <button class="nav-btn" id="nextBtn" onclick="nextSlide()">Next →</button>
+    </div>
+
+    <div class="slide-container" id="slideContainer">
+        
+        <!-- Slide 1: Title -->
+        <div class="slide">
+            <h1>PhotoGallery Lite</h1>
+            <p class="subtitle">A Full-Stack Photo Rating Application</p>
+            <p class="subtitle">with Production-Grade Security</p>
+            <div class="stats">
+                <div class="stat-item">
+                    <span class="stat-number">2</span>
+                    <span class="stat-label">Auth Methods</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">7</span>
+                    <span class="stat-label">Security Layers</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">15T</span>
+                    <span class="stat-label">Years to Crack</span>
+                </div>
+            </div>
+            <p class="author">Jonathan Harmon | CS 333 & CS 456</p>
+            <p class="author" style="font-size: 1em; margin-top: 10px;">
+                🌐 <a href="https://jon.cis251296.projects.jetstream-cloud.org/FinalProject/" style="color: #667eea;">Live Demo</a>
+            </p>
+        </div>
+
+        <!-- Slide 2: Tech Stack -->
+        <div class="slide">
+            <h2>Technology Stack</h2>
+            <div class="tech-stack">
+                <div class="tech-badge">React + TypeScript</div>
+                <div class="tech-badge">Node.js + Express</div>
+                <div class="tech-badge">MongoDB Atlas</div>
+                <div class="tech-badge">Argon2 Hashing</div>
+                <div class="tech-badge">Google OAuth 2.0</div>
+                <div class="tech-badge">Tailwind CSS</div>
+                <div class="tech-badge">PM2 + Nginx</div>
+            </div>
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <h4>Frontend</h4>
+                    <p>React with TypeScript, Vite build tool, Zustand state management, responsive design with Tailwind CSS</p>
+                </div>
+                <div class="feature-card">
+                    <h4>Backend</h4>
+                    <p>Express.js REST API, Passport.js authentication, rate limiting, session management</p>
+                </div>
+                <div class="feature-card">
+                    <h4>Database</h4>
+                    <p>MongoDB Atlas cloud database, indexed schemas, sparse unique fields for dual auth</p>
+                </div>
+                <div class="feature-card">
+                    <h4>Deployment</h4>
+                    <p>Jetstream Cloud hosting, PM2 process manager, Nginx reverse proxy, SSL/HTTPS</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 3: Landing Page & Authentication Choice -->
+        <div class="slide">
+            <h2>Dual Authentication System</h2>
+            <h3>Users can choose their preferred login method:</h3>
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <h4>🔐 Local Authentication</h4>
+                    <p>Username + password with Argon2 hashing</p>
+                    <p>✓ Full control over credentials</p>
+                    <p>✓ No third-party dependency</p>
+                    <p>✓ Password generator included</p>
+                </div>
+                <div class="feature-card">
+                    <h4>🌐 Google OAuth 2.0</h4>
+                    <p>Sign in with existing Google account</p>
+                    <p>✓ No password to remember</p>
+                    <p>✓ Two-factor auth via Google</p>
+                    <p>✓ One-click registration</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 4: Password Generator (SPLIT SCREEN) -->
+        <div class="slide split-screen">
+            <div class="split-left">
+                <h2>Password Generator</h2>
+                <h3>Removes user error from password creation</h3>
+                <ul>
+                    <li>Generates cryptographically secure 16-character passwords</li>
+                    <li>Automatically meets all complexity requirements</li>
+                    <li>One-click copy to clipboard</li>
+                    <li>Achieves maximum zxcvbn strength score (4/4)</li>
+                </ul>
+                <h3 style="margin-top: 30px;">Why Crypto Random?</h3>
+                <p style="font-size: 1em; line-height: 1.5;">
+                    Uses <code>crypto.getRandomValues()</code> instead of <code>Math.random()</code> - cryptographically secure randomness prevents predictability attacks.
+                </p>
+                <p style="font-size: 1em; margin-top: 15px; line-height: 1.5;">
+                    <strong>Example output:</strong> <code>kJ9$mN2#pQ5@vX9&</code>
+                </p>
+            </div>
+            <div class="split-right">
+                <div class="code-block">
+<span class="comment">// Generate secure random password</span>
+<span class="keyword">const</span> <span class="function">generateSecurePassword</span> = () => {
+  <span class="keyword">const</span> charset = 
+    <span class="string">'ABCDEFGHIJKLMNOPQRSTUVWXYZ'</span> +
+    <span class="string">'abcdefghijklmnopqrstuvwxyz'</span> +
+    <span class="string">'0123456789!@#$%^&*'</span>;
+  
+  <span class="keyword">let</span> password = <span class="string">''</span>;
+  
+  <span class="comment">// Crypto random - NOT Math.random()</span>
+  <span class="keyword">const</span> randomValues = 
+    <span class="keyword">new</span> Uint32Array(<span class="highlight">16</span>);
+  crypto.getRandomValues(randomValues);
+  
+  <span class="keyword">for</span> (<span class="keyword">let</span> i = 0; i &lt; 16; i++) {
+    password += charset[
+      randomValues[i] % charset.length
+    ];
+  }
+  
+  <span class="keyword">return</span> password;
+};
+
+<span class="comment">// Result: kJ9$mN2#pQ5@vX9&</span>
+<span class="comment">// 16 chars, guaranteed complexity</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 5: Password Validation -->
+        <div class="slide">
+            <h2>Password Security Validation</h2>
+            <h3>Multi-layer strength checking</h3>
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <h4>Basic Requirements</h4>
+                    <p>✓ Minimum 12 characters</p>
+                    <p>✓ Uppercase letter (A-Z)</p>
+                    <p>✓ Lowercase letter (a-z)</p>
+                    <p>✓ Number (0-9)</p>
+                    <p>✓ Special character (!@#$...)</p>
+                </div>
+                <div class="feature-card">
+                    <h4>Advanced Detection (zxcvbn)</h4>
+                    <p>✗ Common passwords</p>
+                    <p>✗ Keyboard patterns (qwerty)</p>
+                    <p>✗ Dictionary words</p>
+                    <p>✗ Repeated characters (aaaaaa)</p>
+                    <p>✗ Substitutions (P@ssw0rd)</p>
+                </div>
+            </div>
+            <p style="text-align: center; font-size: 1.2em; margin-top: 20px;">
+                Result: <span class="highlight">94^12 ≈ 4.75 × 10²³ possible combinations</span>
+            </p>
+        </div>
+
+        <!-- Slide 6: Argon2 Hashing (SPLIT SCREEN) -->
+        <div class="slide split-screen">
+            <div class="split-left">
+                <h2>Argon2 Password Hashing</h2>
+                <h3>Winner of Password Hashing Competition (2015)</h3>
+                <ul>
+                    <li><strong>Argon2id variant:</strong> Hybrid mode - GPU resistant + side-channel resistant</li>
+                    <li><strong>64 MB memory cost:</strong> Makes GPU attacks expensive</li>
+                    <li><strong>3 iterations:</strong> ~500ms per hash (user-friendly, attacker-hostile)</li>
+                    <li><strong>Unique salt:</strong> Every password gets random 16-byte salt</li>
+                </ul>
+                <h3 style="margin-top: 30px;">Why Memory-Hard?</h3>
+                <p style="font-size: 1em; line-height: 1.5;">
+                    MD5: ~1KB memory → GPU can hash 8 million in parallel
+                </p>
+                <p style="font-size: 1em; line-height: 1.5;">
+                    Argon2: 64MB memory → GPU can hash only 125 in parallel
+                </p>
+                <p style="font-size: 1em; line-height: 1.5; margin-top: 10px;">
+                    <strong>Result:</strong> <span class="highlight" style="font-size: 1.1em;">64,000× slower for attackers</span>
+                </p>
+            </div>
+            <div class="split-right">
+                <div class="code-block">
+<span class="comment">// Hash configuration</span>
+<span class="keyword">await</span> argon2.hash(password, {
+  type: argon2.<span class="highlight">argon2id</span>,
+  
+  <span class="comment">// Memory cost: 64 MB per hash</span>
+  memoryCost: <span class="highlight">2 ** 16</span>,
+  
+  <span class="comment">// Time cost: 3 iterations</span>
+  timeCost: <span class="highlight">3</span>,
+  
+  <span class="comment">// Single thread</span>
+  parallelism: <span class="highlight">1</span>
+});
+
+<span class="comment">// Output format:</span>
+<span class="string">$argon2id$v=19$m=65536,t=3,p=1$[salt]$[hash]</span>
+ ↑         ↑   ↑                ↑       ↑
+ │         │   │                │       └─ Hash value
+ │         │   │                └───────── Random salt
+ │         │   └────────────────────────── Parameters
+ │         └────────────────────────────── Version
+ └──────────────────────────────────────── Algorithm
+
+<span class="comment">// Unique salt = 2^128 possibilities</span>
+<span class="comment">// Rainbow tables: IMPOSSIBLE</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 7: Hash Comparison -->
+        <div class="slide">
+            <h2>Password Hashing Algorithm Comparison</h2>
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>Algorithm</th>
+                        <th>GPU Speed (hashes/sec)</th>
+                        <th>12-char Password</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>MD5</td>
+                        <td>50 billion</td>
+                        <td class="bad">~3 hours</td>
+                        <td class="bad">❌ NEVER USE</td>
+                    </tr>
+                    <tr>
+                        <td>SHA256</td>
+                        <td>2 billion</td>
+                        <td class="bad">~75 hours</td>
+                        <td class="bad">❌ NOT FOR PASSWORDS</td>
+                    </tr>
+                    <tr>
+                        <td>bcrypt</td>
+                        <td>100,000</td>
+                        <td class="good">~1.5 million years</td>
+                        <td>⚠️ Acceptable (older)</td>
+                    </tr>
+                    <tr style="background: #e8f5e9;">
+                        <td><strong>Argon2</strong></td>
+                        <td><strong>1,000</strong></td>
+                        <td class="good"><strong>~15 TRILLION years</strong></td>
+                        <td class="good"><strong>✅ BEST PRACTICE</strong></td>
+                    </tr>
+                </tbody>
+            </table>
+            <div style="margin-top: 20px;">
+                <div class="security-badge">OWASP Recommended</div>
+                <div class="security-badge">NSA Approved</div>
+                <div class="security-badge">Industry Standard</div>
+            </div>
+        </div>
+
+        <!-- Slide 8: MongoDB Database View (SPLIT SCREEN) -->
+        <div class="slide split-screen">
+            <div class="split-left">
+                <h2>Database Structure</h2>
+                <h3>User Schema with Security Fields</h3>
+                <ul>
+                    <li><strong>password field:</strong> Argon2 hash (never plaintext)</li>
+                    <li><strong>authMethod:</strong> Tracks local vs OAuth</li>
+                    <li><strong>failedLoginAttempts:</strong> Counter for lockout</li>
+                    <li><strong>accountLockedUntil:</strong> Lockout expiration</li>
+                    <li><strong>createdAt / lastLogin:</strong> Audit trail</li>
+                </ul>
+                <h3 style="margin-top: 30px;">Security Benefits</h3>
+                <p style="font-size: 1em; line-height: 1.5;">
+                    Database breach doesn't expose passwords - only hashes that can't be reversed.
+                </p>
+                <p style="font-size: 1em; line-height: 1.5; margin-top: 10px;">
+                    Each password has unique embedded salt - rainbow tables are useless.
+                </p>
+            </div>
+            <div class="split-right">
+                <div class="code-block">
+{
+  <span class="string">"_id"</span>: <span class="string">"69a4d75549f9e36b930616d9"</span>,
+  
+  <span class="string">"username"</span>: <span class="string">"johndoe"</span>,
+  <span class="string">"email"</span>: <span class="string">"john@example.com"</span>,
+  
+  <span class="comment">// Password hash (NOT plaintext!)</span>
+  <span class="string">"password"</span>: <span class="string">"$argon2id$v=19$m=65536,t=3,p=1$
+              xyz...random-salt...$
+              abc...hash-value..."</span>,
+  
+  <span class="comment">// Auth method tracking</span>
+  <span class="string">"authMethod"</span>: <span class="string">"local"</span>,
+  
+  <span class="comment">// Security fields</span>
+  <span class="string">"failedLoginAttempts"</span>: <span class="highlight">0</span>,
+  <span class="string">"accountLockedUntil"</span>: <span class="keyword">null</span>,
+  
+  <span class="comment">// Audit trail</span>
+  <span class="string">"createdAt"</span>: <span class="string">"2026-03-02T00:18:29.400Z"</span>,
+  <span class="string">"lastLogin"</span>: <span class="string">"2026-03-02T04:15:33.122Z"</span>
+}
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 9: Attack Prevention -->
+        <div class="slide">
+            <h2>Attack Prevention Mechanisms</h2>
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <h4>Rate Limiting (IP-based)</h4>
+                    <p><strong>Login:</strong> 5 attempts / 15 min</p>
+                    <p><strong>Registration:</strong> 3 accounts / hour</p>
+                    <p>Prevents automated brute force</p>
+                </div>
+                <div class="feature-card">
+                    <h4>Account Lockout</h4>
+                    <p><strong>Trigger:</strong> 5 failed passwords</p>
+                    <p><strong>Duration:</strong> 15 minutes</p>
+                    <p>Shows remaining attempts</p>
+                </div>
+                <div class="feature-card">
+                    <h4>Generic Error Messages</h4>
+                    <p>Always says: "Invalid credentials"</p>
+                    <p>Never reveals if username exists</p>
+                    <p>Prevents username enumeration</p>
+                </div>
+                <div class="feature-card">
+                    <h4>Constant-Time Comparison</h4>
+                    <p>All password checks take same time</p>
+                    <p>Prevents timing attacks</p>
+                    <p>Built into Argon2</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 10: UI Features - Dark Mode (SPLIT SCREEN) -->
+        <div class="slide split-screen">
+            <div class="split-left">
+                <h2>Dark Mode Toggle</h2>
+                <h3>User Experience Feature</h3>
+                <ul>
+                    <li>Persisted to localStorage - remembers your choice</li>
+                    <li>Smooth transitions between themes</li>
+                    <li>Reduces eye strain for night viewing</li>
+                    <li>Applied globally across all pages</li>
+                </ul>
+                <h3 style="margin-top: 30px;">State Persistence</h3>
+                <p style="font-size: 1em; line-height: 1.5;">
+                    Uses browser's localStorage API to save user preference across sessions.
+                </p>
+                <p style="font-size: 1em; line-height: 1.5; margin-top: 10px;">
+                    On load, checks localStorage and applies saved theme before rendering.
+                </p>
+            </div>
+            <div class="split-right">
+                <div class="code-block">
+<span class="comment">// Initialize from localStorage</span>
+<span class="keyword">const</span> [darkMode, setDarkMode] = useState(() => {
+  <span class="keyword">const</span> saved = 
+    localStorage.getItem(<span class="string">'darkMode'</span>);
+  <span class="keyword">return</span> saved ? 
+    JSON.parse(saved) : 
+    <span class="keyword">false</span>;
+});
+
+<span class="comment">// Apply theme to document root</span>
+useEffect(() => {
+  <span class="keyword">if</span> (darkMode) {
+    document.documentElement.classList
+      .<span class="function">add</span>(<span class="string">'dark'</span>);
+  } <span class="keyword">else</span> {
+    document.documentElement.classList
+      .<span class="function">remove</span>(<span class="string">'dark'</span>);
+  }
+  
+  <span class="comment">// Save to localStorage</span>
+  localStorage.setItem(
+    <span class="string">'darkMode'</span>, 
+    JSON.stringify(darkMode)
+  );
+}, [darkMode]);
+
+<span class="comment">// Toggle function</span>
+<span class="keyword">const</span> <span class="function">toggleDarkMode</span> = () => {
+  setDarkMode(!darkMode);
+};
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 11: Rating System -->
+        <div class="slide">
+            <h2>Dual-Layer Star Rating System</h2>
+            <h3>Visual comparison: Your rating vs Community average</h3>
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <h4>🟧 Orange Stars</h4>
+                    <p>Global average rating</p>
+                    <p>What everyone thinks</p>
+                    <p>Always visible</p>
+                </div>
+                <div class="feature-card">
+                    <h4>🟦 Blue Stars</h4>
+                    <p>Your personal rating</p>
+                    <p>What YOU think</p>
+                    <p>Overlays orange stars</p>
+                </div>
+            </div>
+            <h3 style="margin-top: 30px;">Visual Examples</h3>
+            <ul style="font-size: 1.2em;">
+                <li>Photo avg: 3.5 stars, You rated: 5 stars → Blue extends past orange</li>
+                <li>Photo avg: 4.2 stars, You rated: 2 stars → Blue only covers first 2</li>
+                <li>Instant visual feedback: Are you above or below the crowd?</li>
+            </ul>
+        </div>
+
+        <!-- Slide 12: Sort & Filter -->
+        <div class="slide">
+            <h2>Sort & Filter Functionality</h2>
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <h4>Sort Options</h4>
+                    <p>📊 Highest Rated → Lowest</p>
+                    <p>📉 Lowest Rated → Highest</p>
+                    <p>👥 Most Rated (by count)</p>
+                    <p>🔤 Name A-Z / Z-A</p>
+                </div>
+                <div class="feature-card">
+                    <h4>Filter Options</h4>
+                    <p>🌐 All Photos</p>
+                    <p>✅ I've Rated (your ratings)</p>
+                    <p>⭕ Not Rated (need ratings)</p>
+                    <p>⭐ 4+ Stars (highly rated)</p>
+                </div>
+            </div>
+            <h3 style="margin-top: 20px;">Real-Time Count Updates</h3>
+            <ul>
+                <li>Filter counts update immediately after rating</li>
+                <li>"Showing X of Y photos" live indicator</li>
+                <li>No page refresh needed</li>
+                <li>Smooth state management with React</li>
+            </ul>
+        </div>
+
+        <!-- Slide 13: Security Summary -->
+        <div class="slide">
+            <h2>Security Analysis Summary</h2>
+            <h3>7 Layers of Defense</h3>
+            <ol style="font-size: 1.2em; max-width: 800px;">
+                <li><strong>Input Validation</strong> - Sanitize all user input</li>
+                <li><strong>Password Strength Rules</strong> - 12+ chars, complexity</li>
+                <li><strong>zxcvbn Validation</strong> - Pattern detection</li>
+                <li><strong>Rate Limiting</strong> - IP-based throttling</li>
+                <li><strong>Account Lockout</strong> - User-specific protection</li>
+                <li><strong>Argon2 Hashing</strong> - Memory-hard algorithm</li>
+                <li><strong>Constant-Time Comparison</strong> - Timing attack prevention</li>
+            </ol>
+            <h3 style="margin-top: 30px; text-align: center;">Attack Resistance</h3>
+            <div class="stats">
+                <div class="stat-item">
+                    <span class="stat-number">15T</span>
+                    <span class="stat-label">Years (Brute Force)</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">20+</span>
+                    <span class="stat-label">Years (Dictionary)</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">∞</span>
+                    <span class="stat-label">Rainbow Tables</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 14: Conclusion -->
+        <div class="slide">
+            <h1>Questions?</h1>
+            <div class="stats" style="margin-top: 50px;">
+                <div class="stat-item">
+                    <span class="stat-number">750+</span>
+                    <span class="stat-label">Lines of Code</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">100%</span>
+                    <span class="stat-label">Mobile Responsive</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">24/7</span>
+                    <span class="stat-label">Live Deployment</span>
+                </div>
+            </div>
+            <h3 style="margin-top: 50px;">Resources</h3>
+            <ul style="font-size: 1.2em;">
+                <li>🌐 Live Demo: <a href="https://jon.cis251296.projects.jetstream-cloud.org/FinalProject/" style="color: #667eea;">jon.cis251296.projects.jetstream-cloud.org/FinalProject</a></li>
+                <li>💾 GitHub: <a href="https://github.com/JWH2985/cs333fp" style="color: #667eea;">https://github.com/JWH2985/cs333fp</a></li>
+                <li>📧 Contact: harmonj1@sou.edu</li>
+            </ul>
+            <p style="font-size: 1.5em; margin-top: 50px; color: #764ba2; font-weight: bold;">
+                Thank you!
+            </p>
+        </div>
+
+    </div>
+
+    <script>
+        let currentSlide = 0;
+        const totalSlides = 14;
+        const container = document.getElementById('slideContainer');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const slideNumber = document.getElementById('slideNumber');
+
+        function updateSlide() {
+            // Smooth transition with transform
+            container.style.transform = `translateX(-${currentSlide * 100}vw)`;
+            slideNumber.textContent = `${currentSlide + 1} / ${totalSlides}`;
+            
+            // Update button states
+            prevBtn.disabled = currentSlide === 0;
+            nextBtn.disabled = currentSlide === totalSlides - 1;
+        }
+
+        function nextSlide() {
+            if (currentSlide < totalSlides - 1) {
+                currentSlide++;
+                updateSlide();
+            }
+        }
+
+        function prevSlide() {
+            if (currentSlide > 0) {
+                currentSlide--;
+                updateSlide();
+            }
+        }
+
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === ' ') {
+                e.preventDefault();
+                nextSlide();
+            }
+            if (e.key === 'ArrowLeft') {
+                e.preventDefault();
+                prevSlide();
+            }
+            if (e.key === 'Home') {
+                e.preventDefault();
+                currentSlide = 0;
+                updateSlide();
+            }
+            if (e.key === 'End') {
+                e.preventDefault();
+                currentSlide = totalSlides - 1;
+                updateSlide();
+            }
+        });
+
+        // Prevent default scroll behavior
+        document.addEventListener('wheel', (e) => {
+            e.preventDefault();
+        }, { passive: false });
+
+        // Touch swipe support for mobile
+        let touchStartX = 0;
+        let touchEndX = 0;
+
+        document.addEventListener('touchstart', (e) => {
+            touchStartX = e.changedTouches[0].screenX;
+        });
+
+        document.addEventListener('touchend', (e) => {
+            touchEndX = e.changedTouches[0].screenX;
+            handleSwipe();
+        });
+
+        function handleSwipe() {
+            if (touchEndX < touchStartX - 50) nextSlide(); // Swipe left
+            if (touchEndX > touchStartX + 50) prevSlide(); // Swipe right
+        }
+
+        // Initialize
+        updateSlide();
+    </script>
+</body>
+</html>
