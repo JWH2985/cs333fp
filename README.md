@@ -44,7 +44,7 @@ A full-stack photo gallery application with user authentication and interactive 
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/JWH2985/photogallery-lite.git
+git clone https://github.com/JWH2985/cs333fp.git
 cd photogallery-lite
 ```
 
@@ -268,7 +268,7 @@ MIT License - feel free to use this project as a learning resource.
 
 **Jon Harmon**
 - Portfolio: [jonathanharmonvisuals.com](https://jonathanharmonvisuals.com)
-- GitHub: [@yourusername](https://github.com/JWH2985)
+- GitHub: [@JWH2985](https://github.com/JWH2985)
 
 ## 🙏 Acknowledgments
 
